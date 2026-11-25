@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Admin Dashboard | Smart OPD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f3f7fa;
+            color: #243b50;
+            font-family: Arial, sans-serif;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #153b55;
+            color: white;
+            padding: 28px 18px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            font-size: 21px;
+            margin: 0 0 35px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #dce9f0;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 7px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #159f9b;
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            min-width: 0;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            margin: 0 0 6px;
+            color: #153b55;
+        }
+
+        .topbar p {
+            margin: 0;
+            color: #788b99;
+            font-size: 14px;
+        }
+
+        .admin-pill {
+            background: #e3f5f3;
+            color: #128b87;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 5 Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px 18px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(20, 59, 85, 0.05);
+            border-top: 4px solid #159f9b;
+        }
+
+        .stat-card.card-blue { border-top-color: #3b82f6; }
+        .stat-card.card-amber { border-top-color: #f59e0b; }
+        .stat-card.card-purple { border-top-color: #8b5cf6; }
+        .stat-card.card-green { border-top-color: #10b981; }
+        .stat-card.card-teal { border-top-color: #14b8a6; }
+
+        .stat-card p {
+            color: #7b8d9a;
+            font-size: 12px;
+            margin: 0 0 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .stat-card h2 {
+            font-size: 28px;
+            margin: 0;
+            color: #153b55;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 22px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 3px 15px rgba(20, 59, 85, 0.05);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #edf1f4;
+            padding-bottom: 12px;
+        }
+
+        .panel h3 {
+            color: #153b55;
+            font-size: 17px;
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 13px 10px;
+            text-align: left;
+            border-bottom: 1px solid #edf1f4;
+        }
+
+        th {
+            color: #82919c;
+            font-weight: 600;
+            background: #fafcfd;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-normal { background: #e3f7ed; color: #16834d; }
+        .status-busy { background: #fff0dc; color: #bd7517; }
+        .status-active { background: #e8edff; color: #4358a8; }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e8eef2;
+            border-radius: 8px;
+            color: #24516b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .quick-link:hover {
+            border-color: #159f9b;
+            background: #f3fbfa;
+            color: #159f9b;
+        }
+
+        .overview-box {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(20, 59, 85, 0.05);
+        }
+
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .admin-layout {
+                display: block;
+            }
+            .sidebar {
+                width: auto;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <aside class="sidebar">
+        <div>
+            <h2>🏥 Smart OPD</h2>
+            <a href="/admin-dashboard" class="active">📊 Overview Dashboard</a>
+            <a href="/admin-queue">👥 Manage Patient Queue</a>
+            <a href="/admin-doctors">👨‍⚕️ Doctor Management</a>
+            <a href="/setup-staff">🛡️ Staff Accounts</a>
+            <a href="/">🌐 Public Home Page</a>
+        </div>
+        <div>
+            <a href="/admin-logout" style="color:#fca5a5;">🚪 Logout ({{ session.get('staff_name', 'Staff') }})</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <div class="topbar">
+            <div>
+                <h1>Hospital Administration Dashboard</h1>
+                <p>Real-Time Operations &bull; Today's Date: <strong>{{ today_str }}</strong></p>
+            </div>
+
+            <div class="admin-pill">
+                🛡️ {{ session.get('staff_role', 'Hospital Staff') }}: {{ session.get('staff_name', 'Admin') }}
+            </div>
+        </div>
+
+        <!-- 5 KPI Cards -->
+        <section class="stats-grid">
+
+            <div class="stat-card card-blue">
+                <p>Appointments Today</p>
+                <h2>{{ total_appointments_today|default(0) }}</h2>
+            </div>
+
+            <div class="stat-card card-teal">
+                <p>Total Registered in Queue</p>
+                <h2>{{ total_queue_today|default(0) }}</h2>
+            </div>
+
+            <div class="stat-card card-amber">
+                <p>Patients Waiting</p>
+                <h2>{{ waiting_today|default(0) }}</h2>
+            </div>
+
+            <div class="stat-card card-purple">
+                <p>In Consultation</p>
+                <h2>{{ in_consultation_today|default(0) }}</h2>
+            </div>
+
+            <div class="stat-card card-green">
+                <p>Completed Consultations</p>
+                <h2>{{ completed_today|default(0) }}</h2>
+            </div>
+
+        </section>
+
+        <div class="content-grid">
+
+            <!-- Department Queue Statistics (Covering the 6 departments) -->
+            <section class="panel">
+                <div class="panel-header">
+                    <h3>Department-wise Queue Statistics (Today)</h3>
+                    <a href="/admin-queue" style="color:#159f9b; font-size:13px; text-decoration:none; font-weight:bold;">View Queue Grid →</a>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Booked</th>
+                                <th>Waiting</th>
+                                <th>In Consultation</th>
+                                <th>Completed</th>
+                                <th>Congestion Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for dept in dept_stats %}
+                            <tr>
+                                <td><strong>{{ dept.name }}</strong></td>
+                                <td>{{ dept.total }}</td>
+                                <td><span style="color:#bd7517; font-weight:bold;">{{ dept.waiting }}</span></td>
+                                <td><span style="color:#5367b8; font-weight:bold;">{{ dept.in_consultation }}</span></td>
+                                <td><span style="color:#16834d; font-weight:bold;">{{ dept.completed }}</span></td>
+                                <td>
+                                    {% if dept.waiting >= 10 %}
+                                        <span class="status status-busy">High Congestion</span>
+                                    {% elif dept.waiting > 0 or dept.in_consultation > 0 %}
+                                        <span class="status status-active">Active Queue</span>
+                                    {% else %}
+                                        <span class="status status-normal">Normal / Idle</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6">No department queue data recorded today.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Quick Management Shortcuts -->
+            <section class="panel">
+                <div class="panel-header">
+                    <h3>Administrative Actions</h3>
+                </div>
+
+                <a href="/admin-queue" class="quick-link">
+                    <span>👥 Live Patient Queue Control</span>
+                    <span>→</span>
+                </a>
+
+                <a href="/admin-doctors" class="quick-link">
+                    <span>👨‍⚕️ Manage Doctors &amp; Availability</span>
+                    <span>→</span>
+                </a>
+
+                <a href="/setup-staff" class="quick-link">
+                    <span>🛡️ Hospital Staff Accounts</span>
+                    <span>→</span>
+                </a>
+
+                <a href="/appointment" class="quick-link">
+                    <span>📅 Book Patient Appointment (Desk)</span>
+                    <span>→</span>
+                </a>
+
+                <div style="margin-top: 20px; padding: 15px; background: #eaf5f7; border-radius: 8px; font-size: 12px; color: #174b72; line-height: 1.5;">
+                    💡 <strong>Staff Guidance:</strong> Update patient statuses promptly to keep wait-time predictions and departure advice synchronized for waiting patients.
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart OPD | Intelligent Hospital Queue Management</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- Navigation Bar -->
+<header class="navbar">
+    <div class="logo">
+        <span class="logo-icon">✚</span>
+        Smart<span>OPD</span>
+    </div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#about">About</a>
+    </nav>
+
+    <div class="nav-buttons">
+        <a href="/admin-login" class="login-btn">Staff Portal</a>
+        <a href="/login" class="login-btn">Login</a>
+        <a href="/register" class="register-btn">Get Started</a>
+    </div>
+</header>
+
+
+<!-- Hero Section -->
+<section class="hero">
+
+    <div class="hero-content">
+
+        <span class="tagline">SMARTER HEALTHCARE EXPERIENCE</span>
+
+        <h1>
+            Less Waiting.<br>
+            <span>Better Healthcare.</span>
+        </h1>
+
+        <p>
+            Experience a smarter way to manage hospital visits.
+            Get AI-powered waiting time predictions, track your
+            OPD queue and plan your hospital visit with confidence.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="/register" class="primary-btn">
+                Book Your Appointment →
+            </a>
+
+            <a href="#how-it-works" class="secondary-btn">
+                Learn More
+            </a>
+        </div>
+
+        <div class="hero-stats">
+            <div>
+                <h3>AI Powered</h3>
+                <p>Wait Predictions</p>
+            </div>
+
+            <div>
+                <h3>Real-Time</h3>
+                <p>Queue Tracking</p>
+            </div>
+
+            <div>
+                <h3>24/7</h3>
+                <p>Online Access</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="hero-visual">
+        <div class="medical-icon">✚</div>
+
+        <div class="floating-card">
+            <span class="status-dot"></span>
+            <div>
+                <strong>Smart OPD Management</strong>
+                <p>Making hospital visits easier</p>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- Features Section -->
+<section class="features" id="features">
+
+    <div class="section-heading">
+        <span>OUR FEATURES</span>
+        <h2>Healthcare Made Smarter</h2>
+        <p>
+            Everything you need for a smoother and more
+            transparent hospital experience.
+        </p>
+    </div>
+
+    <div class="feature-grid">
+
+        <div class="feature-card">
+            <div class="feature-icon">🧠</div>
+            <h3>AI Wait Time Prediction</h3>
+            <p>
+                Deep learning models estimate patient waiting
+                times using historical queue information.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🎫</div>
+            <h3>Digital Token System</h3>
+            <p>
+                Receive a digital token and track your position
+                in the hospital queue.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">⏱️</div>
+            <h3>Live Queue Tracking</h3>
+            <p>
+                Monitor your queue status and receive updated
+                waiting time estimates.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Online Appointments</h3>
+            <p>
+                Select your department and doctor and book
+                your OPD appointment online.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🏥</div>
+            <h3>Hospital Dashboard</h3>
+            <p>
+                Help hospital staff monitor department queues,
+                patient flow and doctor availability.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Congestion Monitoring</h3>
+            <p>
+                Identify busy periods and help hospitals
+                manage patient flow efficiently.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- How It Works -->
+<section class="how-section" id="how-it-works">
+
+    <div class="section-heading">
+        <span>SIMPLE PROCESS</span>
+        <h2>How Smart OPD Works</h2>
+        <p>Four simple steps towards a better hospital visit.</p>
+    </div>
+
+    <div class="steps">
+
+        <div class="step">
+            <div class="step-number">01</div>
+            <h3>Create Account</h3>
+            <p>Register securely on the Smart OPD platform.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">02</div>
+            <h3>Book Appointment</h3>
+            <p>Select your preferred department and doctor.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">03</div>
+            <h3>Get Prediction</h3>
+            <p>Receive estimated waiting and consultation times.</p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">04</div>
+            <h3>Track Your Queue</h3>
+            <p>Monitor your token and hospital visit status.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- About Section -->
+<section class="about-section" id="about">
+
+    <div class="about-content">
+        <span>ABOUT SMART OPD</span>
+
+        <h2>Making Hospital Visits More Predictable</h2>
+
+        <p>
+            Smart OPD is a deep learning-based hospital queue
+            management system designed to improve transparency
+            in outpatient departments.
+        </p>
+
+        <p>
+            By combining waiting time prediction, consultation
+            duration estimation and queue monitoring, the system
+            aims to help patients plan their visits and support
+            better hospital operations.
+        </p>
+
+        <a href="/register" class="primary-btn">
+            Get Started →
+        </a>
+    </div>
+
+</section>
+
+
+<!-- Footer -->
+<footer class="footer">
+
+    <div class="logo">
+        <span class="logo-icon">✚</span>
+        Smart<span>OPD</span>
+    </div>
+
+    <p>Smarter queues. Better healthcare experiences.</p>
+
+    <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/login">Patient Login</a>
+        <a href="/register">Register</a>
+        <a href="/admin-login">Staff Portal</a>
+    </div>
+
+    <p class="copyright">
+        © 2026 Smart OPD. Academic Project.
+    </p>
+
+</footer>
+
+</body>
+</html>

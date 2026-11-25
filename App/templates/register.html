@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration | Smart OPD</title>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #eaf5f7, #f4f7fb);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 36px;
+            width: 420px;
+            max-width: 100%;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(20, 59, 85, 0.10);
+        }
+        .brand {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #153b55;
+            margin-bottom: 6px;
+        }
+        .brand span { color: #159f9b; }
+        h2 {
+            text-align: center;
+            color: #174b72;
+            margin: 6px 0 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #758695;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .alert-error {
+            background: #ffebeb;
+            color: #c92a2a;
+            padding: 11px 14px;
+            border-radius: 7px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-top: 14px;
+            font-weight: bold;
+            font-size: 13px;
+            color: #174b72;
+        }
+        input {
+            width: 100%;
+            padding: 11px 12px;
+            margin-top: 6px;
+            border: 1px solid #dce5eb;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+        }
+        input:focus {
+            border-color: #159f9b;
+            box-shadow: 0 0 0 3px rgba(21,159,155,0.10);
+        }
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 22px;
+            background: #159f9b;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover { background: #117c79; }
+        .links {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .links a {
+            color: #159f9b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="brand">✚ Smart<span>OPD</span></div>
+    <h2>Patient Registration</h2>
+    <p class="subtitle">Create your Smart OPD account to book appointments online</p>
+
+    {% if error %}
+    <div class="alert-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/register">
+        <label>Full Name</label>
+        <input type="text" name="full_name" placeholder="Enter your full name" required>
+
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="patient@example.com" required>
+
+        <label>Phone Number</label>
+        <input type="tel" name="phone" placeholder="e.g. 9876543210">
+
+        <label>Password (min. 8 characters)</label>
+        <input type="password" name="password" placeholder="Create a strong password" required minlength="8">
+
+        <button type="submit">Register Account →</button>
+    </form>
+
+    <div class="links">
+        Already have an account? <a href="/login">Login here</a><br><br>
+        <a href="/" style="color:#526777; font-weight:normal;">← Back to Home</a>
+    </div>
+</div>
+
+</body>
+</html>

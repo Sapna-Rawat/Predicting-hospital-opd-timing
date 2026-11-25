@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Login | Smart OPD</title>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #eaf5f7, #f4f7fb);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 36px;
+            width: 400px;
+            max-width: 100%;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(20, 59, 85, 0.10);
+        }
+        .brand {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #153b55;
+            margin-bottom: 6px;
+        }
+        .brand span { color: #159f9b; }
+        h2 {
+            text-align: center;
+            color: #174b72;
+            margin: 6px 0 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #758695;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+        .alert-error {
+            background: #ffebeb;
+            color: #c92a2a;
+            padding: 11px 14px;
+            border-radius: 7px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .alert-success {
+            background: #e7f7ed;
+            color: #16834f;
+            padding: 11px 14px;
+            border-radius: 7px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-top: 16px;
+            font-weight: bold;
+            font-size: 13px;
+            color: #174b72;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 7px;
+            border: 1px solid #dce5eb;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+        }
+        input:focus {
+            border-color: #159f9b;
+            box-shadow: 0 0 0 3px rgba(21,159,155,0.10);
+        }
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 24px;
+            background: #159f9b;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover { background: #117c79; }
+        .register {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .register a {
+            color: #159f9b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .home-link {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+        .home-link a {
+            color: #526777;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="brand">✚ Smart<span>OPD</span></div>
+    <h2>Patient Login</h2>
+    <p class="subtitle">Access your appointments, live tokens, and wait-time predictions</p>
+
+    {% if error %}
+    <div class="alert-error">{{ error }}</div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="{% if category == 'success' %}alert-success{% else %}alert-error{% endif %}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/login">
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="patient@example.com" required>
+
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter your password" required>
+
+        <button type="submit">Login →</button>
+    </form>
+
+    <div class="register">
+        Don't have an account? <a href="/register">Register here</a>
+    </div>
+    <div class="home-link">
+        <a href="/">← Back to Home</a> &bull; <a href="/admin-login">Staff Portal</a>
+    </div>
+</div>
+
+</body>
+</html>

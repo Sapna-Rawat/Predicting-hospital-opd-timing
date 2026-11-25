@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Patient Queue | Smart OPD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f3f7fa;
+            color: #243b50;
+            font-family: Arial, sans-serif;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #153b55;
+            color: white;
+            padding: 28px 18px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            font-size: 21px;
+            margin: 0 0 35px;
+            color: white;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #dce9f0;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 7px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #159f9b;
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            min-width: 0;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            color: #153b55;
+            margin: 0 0 7px;
+        }
+
+        .topbar p {
+            color: #788b99;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(20, 59, 85, 0.05);
+            border-top: 3px solid #159f9b;
+        }
+
+        .summary-card p {
+            color: #7b8d9a;
+            font-size: 12px;
+            margin: 0 0 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .summary-card h2 {
+            font-size: 26px;
+            color: #153b55;
+            margin: 0;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 3px 15px rgba(20, 59, 85, 0.05);
+        }
+
+        /* Filter Controls Form */
+        .filter-bar {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: white;
+            color: #334155;
+            font-size: 13px;
+        }
+
+        .filter-btn {
+            background: #159f9b;
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 18px;
+        }
+
+        .filter-btn:hover {
+            background: #117c79;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 13px 10px;
+            text-align: left;
+            border-bottom: 1px solid #edf1f4;
+        }
+
+        th {
+            color: #82919c;
+            font-weight: 600;
+            background: #fafcfd;
+        }
+
+        .token-tag {
+            background: #e0f4f4;
+            color: #0d7976;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-booked { background: #e8f3fb; color: #1e70bf; }
+        .status-reached { background: #e3f5f3; color: #128b87; }
+        .status-waiting { background: #fff0dc; color: #bd7517; }
+        .status-in-consultation { background: #e8edff; color: #5367b8; }
+        .status-completed { background: #e3f7ed; color: #16834d; }
+        .status-cancelled { background: #fbeae8; color: #c0392b; }
+
+        .update-form {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .update-form select {
+            padding: 6px 8px;
+            border: 1px solid #dce5eb;
+            border-radius: 6px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .update-btn {
+            padding: 6px 12px;
+            background: #159f9b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .update-btn:hover {
+            background: #117c79;
+        }
+
+        .timestamp-info {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .notice {
+            margin-top: 25px;
+            padding: 16px;
+            background: #eaf5f7;
+            color: #315c70;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 900px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .admin-layout {
+                display: block;
+            }
+            .sidebar {
+                width: auto;
+            }
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <aside class="sidebar">
+        <div>
+            <h2>🏥 Smart OPD</h2>
+            <a href="/admin-dashboard">📊 Dashboard</a>
+            <a href="/admin-queue" class="active">👥 Manage Queue</a>
+            <a href="/admin-doctors">👨‍⚕️ Doctor Management</a>
+            <a href="/setup-staff">🛡️ Staff Accounts</a>
+            <a href="/">🌐 Public Home</a>
+        </div>
+        <div>
+            <a href="/admin-logout" style="color:#fca5a5;">🚪 Logout ({{ session.get('staff_name', 'Staff') }})</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <div class="topbar">
+            <div>
+                <h1>Hospital Queue Control Station</h1>
+                <p>Filter by Department &amp; Date &bull; Live Arrival and Consultation Status Tracking</p>
+            </div>
+            <div>
+                <a href="/admin-queue" class="filter-btn" style="text-decoration:none;">🔄 Refresh Queue</a>
+            </div>
+        </div>
+
+        {% if request.args.get('error') %}
+        <div style="background:#ffebeb; color:#c92a2a; padding:12px 16px; border-radius:8px; font-size:13px; margin-bottom:18px;">
+            {{ request.args.get('error') }}
+        </div>
+        {% endif %}
+
+        {% if request.args.get('success') %}
+        <div style="background:#e7f7ed; color:#16834d; padding:12px 16px; border-radius:8px; font-size:13px; margin-bottom:18px;">
+            {{ request.args.get('success') }}
+        </div>
+        {% endif %}
+
+        <!-- Summary KPIs -->
+        <section class="summary-grid">
+            <div class="summary-card">
+                <p>Selected Filter Total</p>
+                <h2>{{ total_queue|default(0) }}</h2>
+            </div>
+            <div class="summary-card">
+                <p>Patients Reached</p>
+                <h2>{{ reached_count|default(0) }}</h2>
+            </div>
+            <div class="summary-card">
+                <p>Patients Waiting</p>
+                <h2>{{ waiting_count|default(0) }}</h2>
+            </div>
+            <div class="summary-card">
+                <p>Consultations Completed</p>
+                <h2>{{ completed_count|default(0) }}</h2>
+            </div>
+        </section>
+
+        <section class="panel">
+
+            <!-- Department & Date Filter Form -->
+            <form method="GET" action="/admin-queue" class="filter-bar">
+                <div class="filter-group">
+                    <label>Select Department</label>
+                    <select name="department_id" id="departmentFilter">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.department_id }}" {% if selected_department_id == dept.department_id %}selected{% endif %}>
+                            {{ dept.department_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Appointment Date</label>
+                    <input type="date" name="appointment_date" value="{{ selected_date }}">
+                </div>
+
+                <button type="submit" class="filter-btn">Apply Filter</button>
+                <a href="/admin-queue" style="margin-top:24px; color:#64748b; font-size:13px; text-decoration:none;">Clear Filter</a>
+            </form>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Patient Name</th>
+                            <th>Department</th>
+                            <th>Doctor</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Timestamps Recorded</th>
+                            <th>Update Queue Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in queue_items %}
+                        <tr>
+                            <td><span class="token-tag">#{{ item.token_number }}</span></td>
+                            <td>
+                                <strong>{{ item.patient_name }}</strong><br>
+                                <span style="font-size:11px; color:#64748b;">{{ item.patient_phone or item.patient_email }}</span>
+                            </td>
+                            <td>{{ item.department_name }}</td>
+                            <td>{{ item.doctor_name }}</td>
+                            <td>{{ item.appointment_time or "Session Time" }}</td>
+
+                            <td>
+                                {% set q_stat = item.queue_status %}
+                                {% if q_stat == 'Reached' %}
+                                    <span class="status status-reached">Reached</span>
+                                {% elif q_stat == 'In Consultation' %}
+                                    <span class="status status-in-consultation">In Consultation</span>
+                                {% elif q_stat == 'Completed' %}
+                                    <span class="status status-completed">Completed</span>
+                                {% elif q_stat == 'Cancelled' %}
+                                    <span class="status status-cancelled">Cancelled</span>
+                                {% elif q_stat == 'Waiting' %}
+                                    <span class="status status-waiting">Waiting</span>
+                                {% else %}
+                                    <span class="status status-booked">Booked</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="timestamp-info">
+                                {% if item.arrival_time %}
+                                    🟢 Arr: {{ item.arrival_time }}<br>
+                                {% endif %}
+                                {% if item.consultation_start %}
+                                    🔵 Start: {{ item.consultation_start }}<br>
+                                {% endif %}
+                                {% if item.consultation_end %}
+                                    ✅ End: {{ item.consultation_end }}
+                                {% endif %}
+                                {% if not item.arrival_time and not item.consultation_start and not item.consultation_end %}
+                                    <span style="color:#94a3b8;">No timestamps yet</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <form method="POST" action="/admin-update-queue" class="update-form">
+                                    <input type="hidden" name="queue_id" value="{{ item.queue_id }}">
+                                    <input type="hidden" name="department_id" value="{{ selected_department_id or '' }}">
+                                    <input type="hidden" name="appointment_date" value="{{ selected_date }}">
+
+                                    <select name="queue_status" required>
+                                        <option value="Booked" {% if item.queue_status == 'Booked' %}selected{% endif %}>Booked</option>
+                                        <option value="Reached" {% if item.queue_status == 'Reached' %}selected{% endif %}>Reached</option>
+                                        <option value="Waiting" {% if item.queue_status == 'Waiting' %}selected{% endif %}>Waiting</option>
+                                        <option value="In Consultation" {% if item.queue_status == 'In Consultation' %}selected{% endif %}>In Consultation</option>
+                                        <option value="Completed" {% if item.queue_status == 'Completed' %}selected{% endif %}>Completed</option>
+                                        <option value="Cancelled" {% if item.queue_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                    </select>
+
+                                    <button type="submit" class="update-btn">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" style="text-align:center; padding:35px; color:#64748b;">
+                                No appointments found for the selected department and date criteria.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <div class="notice">
+            <strong>Automatic Lifecycle Timestamps:</strong>
+            Marking a patient as <em>Reached</em> or <em>Waiting</em> automatically sets <code>arrival_time</code> if not recorded. Marking <em>In Consultation</em> records <code>consultation_start</code>. Marking <em>Completed</em> records <code>consultation_end</code>. All timestamp events are persisted directly into the SQLite <code>queue</code> table.
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

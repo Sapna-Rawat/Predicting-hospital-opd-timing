@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Tracking | Smart OPD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            background: #f3f7fa;
+        }
+
+        .queue-container {
+            max-width: 1050px;
+            margin: 40px auto;
+            padding: 0 25px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            color: #153b55;
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+
+        .page-heading p {
+            color: #758695;
+            font-size: 14px;
+        }
+
+        .refresh-btn {
+            background: #ffffff;
+            border: 1px solid #159f9b;
+            color: #159f9b;
+            padding: 8px 16px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-btn:hover {
+            background: #159f9b;
+            color: white;
+        }
+
+        .queue-card {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .token-area {
+            text-align: center;
+            padding: 25px;
+            background: #eaf7f7;
+            border-radius: 12px;
+            border: 1px dashed #159f9b;
+        }
+
+        .token-area h2 {
+            color: #174b72;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .token-number {
+            font-size: 55px;
+            font-weight: bold;
+            color: #159f9b;
+            margin: 8px 0;
+            letter-spacing: 1px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 7px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-booked { background: #e8f3fb; color: #1e70bf; }
+        .status-reached { background: #e3f5f3; color: #128b87; }
+        .status-waiting { background: #fff0dc; color: #bd7517; }
+        .status-in-consultation { background: #e8edff; color: #5367b8; }
+        .status-completed { background: #e3f7ed; color: #16834d; }
+        .status-cancelled { background: #fbeae8; color: #c0392b; }
+
+        .meta-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+
+        .meta-item p {
+            color: #8393a1;
+            font-size: 12px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-item strong {
+            color: #153b55;
+            font-size: 15px;
+        }
+
+        .queue-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: #f6f9fb;
+            padding: 22px;
+            border-radius: 10px;
+            text-align: center;
+            border-top: 3px solid #159f9b;
+        }
+
+        .stat-card h3 {
+            font-size: 28px;
+            color: #159f9b;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #758695;
+            font-size: 13px;
+        }
+
+        .stat-card .source-badge {
+            font-size: 11px;
+            display: inline-block;
+            margin-top: 8px;
+            padding: 3px 8px;
+            background: #e2e8f0;
+            color: #475569;
+            border-radius: 4px;
+        }
+
+        .timeline {
+            margin-top: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .timeline h3 {
+            color: #153b55;
+            font-size: 17px;
+            margin-bottom: 18px;
+        }
+
+        .timeline-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .step-item {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .step-item.active .step-circle {
+            background: #159f9b;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(21,159,155,0.2);
+        }
+
+        .step-item.done .step-circle {
+            background: #16834d;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .note {
+            color: #758695;
+            font-size: 12px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .action-footer {
+            margin-top: 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        @media (max-width: 750px) {
+            .meta-details, .queue-stats {
+                grid-template-columns: 1fr;
+            }
+            .token-number {
+                font-size: 42px;
+            }
+            .timeline-steps {
+                flex-direction: column;
+                gap: 15px;
+                text-align: left;
+            }
+            .step-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .step-circle {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="logo">
+        <span class="logo-icon">✚</span>
+        Smart<span>OPD</span>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="/dashboard" class="login-btn">Dashboard</a>
+        <a href="/appointment" class="dashboard-btn" style="padding:8px 14px; font-size:13px; background:#159f9b; color:white; border-radius:6px; text-decoration:none;">Book Appointment</a>
+        <a href="/logout" class="register-btn">Logout</a>
+    </div>
+</header>
+
+<main class="queue-container">
+
+    <section class="page-heading">
+        <div>
+            <h1>Live Queue Tracking</h1>
+            <p>Real-time updates for your OPD consultation queue.</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            {% if all_appointments and all_appointments|length > 1 %}
+            <form method="GET" action="/queue" style="display:inline-flex; gap:8px; align-items:center;">
+                <select name="appointment_id" onchange="this.form.submit()" style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:7px; font-size:13px; background:white;">
+                    {% for apt_item, dept_item, q_item in all_appointments %}
+                    <option value="{{ apt_item.appointment_id }}" {% if appointment and apt_item.appointment_id == appointment.appointment_id %}selected{% endif %}>
+                        {{ apt_item.appointment_date }} - {{ dept_item.department_name }} (Token #{{ q_item.token_number if q_item else '--' }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
+            <a href="javascript:location.reload();" class="refresh-btn">🔄 Refresh Queue</a>
+        </div>
+    </section>
+
+    {% if appointment %}
+    <section class="queue-card">
+
+        <div class="token-area">
+            <h2>Your OPD Token</h2>
+
+            <div class="token-number">
+                #{{ token_number | default(queue_entry.token_number if queue_entry else '--') }}
+            </div>
+
+            {% set q_stat = queue_status or (queue_entry.queue_status if queue_entry else 'Booked') %}
+            {% if q_stat == 'Reached' %}
+                <span class="status-badge status-reached">Status: Reached Hospital</span>
+            {% elif q_stat == 'Waiting' %}
+                <span class="status-badge status-waiting">Status: Waiting for Call</span>
+            {% elif q_stat == 'In Consultation' %}
+                <span class="status-badge status-in-consultation">Status: In Consultation with Doctor</span>
+            {% elif q_stat == 'Completed' %}
+                <span class="status-badge status-completed">Status: Consultation Completed</span>
+            {% elif q_stat == 'Cancelled' %}
+                <span class="status-badge status-cancelled">Status: Cancelled</span>
+            {% else %}
+                <span class="status-badge status-booked">Status: Booked</span>
+            {% endif %}
+        </div>
+
+        <div class="meta-details">
+            <div class="meta-item">
+                <p>Department</p>
+                <strong>{{ department.department_name if department else '--' }}</strong>
+            </div>
+            <div class="meta-item">
+                <p>Assigned Doctor</p>
+                <strong>{{ doctor.doctor_name if doctor else '--' }}</strong>
+            </div>
+            <div class="meta-item">
+                <p>Appointment Date</p>
+                <strong>{{ appointment.appointment_date }}</strong>
+            </div>
+            <div class="meta-item">
+                <p>Scheduled Time</p>
+                <strong>{{ appointment.appointment_time or "Session Time" }}</strong>
+            </div>
+        </div>
+
+        <div class="queue-stats">
+
+            <div class="stat-card">
+                <h3>{{ patients_ahead if patients_ahead is defined else 0 }}</h3>
+                <p>Patients Ahead in Queue</p>
+                <span class="source-badge">Active Department Queue</span>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ wait_minutes | round(1) if wait_minutes is defined and wait_minutes is not none else '--' }} <small style="font-size:16px;">min</small></h3>
+                <p>Estimated Waiting Time</p>
+                <span class="source-badge">
+                    {% if is_lstm_wait %}
+                        🧠 {{ wait_label }}
+                    {% else %}
+                        ⏱️ {{ wait_label | default('Queue-Based Estimate') }}
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ service_minutes | round(1) if service_minutes is defined and service_minutes is not none else '--' }} <small style="font-size:16px;">min</small></h3>
+                <p>Estimated Consultation Time</p>
+                <span class="source-badge">
+                    {% if is_lstm_service %}
+                        🧠 {{ service_label }}
+                    {% else %}
+                        ⏱️ {{ service_label | default('Historical Reference Estimate') }}
+                    {% endif %}
+                </span>
+            </div>
+
+        </div>
+
+        <p class="note">
+            💡 <strong>Queue Calculation Note:</strong> Position is computed dynamically from active patients booked/reached/waiting ahead of you for {{ department.department_name if department else "your department" }} today. Completed and cancelled consultations are excluded.
+        </p>
+
+    </section>
+
+    <!-- Queue Lifecycle Timeline -->
+    <section class="timeline">
+        <h3>Consultation Progress Timeline</h3>
+        <div class="timeline-steps">
+            <div class="step-item {% if q_stat in ['Booked', 'Reached', 'Waiting', 'In Consultation', 'Completed'] %}done{% endif %}">
+                <div class="step-circle">1</div>
+                <div class="step-title">Booked</div>
+            </div>
+            <div class="step-item {% if q_stat in ['Reached', 'Waiting', 'In Consultation', 'Completed'] %}done{% elif q_stat == 'Booked' %}active{% endif %}">
+                <div class="step-circle">2</div>
+                <div class="step-title">Reached</div>
+            </div>
+            <div class="step-item {% if q_stat in ['Waiting', 'In Consultation', 'Completed'] %}done{% elif q_stat == 'Reached' %}active{% endif %}">
+                <div class="step-circle">3</div>
+                <div class="step-title">Waiting</div>
+            </div>
+            <div class="step-item {% if q_stat in ['In Consultation', 'Completed'] %}done{% elif q_stat == 'Waiting' %}active{% endif %}">
+                <div class="step-circle">4</div>
+                <div class="step-title">In Consultation</div>
+            </div>
+            <div class="step-item {% if q_stat == 'Completed' %}done{% endif %}">
+                <div class="step-circle">5</div>
+                <div class="step-title">Completed</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="action-footer">
+        <a href="/prediction?appointment_id={{ appointment.appointment_id }}" class="dashboard-btn" style="padding:10px 18px; background:#159f9b; color:white; border-radius:7px; text-decoration:none; font-weight:bold;">View Detailed AI Predictions &amp; Departure Advisor →</a>
+        <a href="/dashboard" class="refresh-btn">Back to Dashboard</a>
+    </div>
+
+    {% else %}
+    <section class="queue-card" style="text-align:center; padding:50px 20px;">
+        <h3 style="color:#153b55; margin-bottom:10px;">No Active Queue Entry Found</h3>
+        <p style="color:#758695; margin-bottom:20px;">You currently do not have an active OPD appointment or queue token.</p>
+        <a href="/appointment" class="dashboard-btn" style="padding:10px 20px; background:#159f9b; color:white; border-radius:7px; text-decoration:none; font-weight:bold;">Book an Appointment Now</a>
+    </section>
+    {% endif %}
+
+</main>
+
+</body>
+</html>

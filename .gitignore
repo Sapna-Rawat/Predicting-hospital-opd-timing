@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Flask
+instance/
+App/.flask_secret_key
+*.log
+
+# Database (keep structure, ignore live data changes)
+# Comment this out if you want to include the DB
+# database/opd_management.db
+
+# Models (large binary files - optional to exclude)
+# Models/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+
+# Temp files
+*.tmp
+*.temp
+scratch/

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Staff Account | Smart OPD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #eaf5f7, #f4f7fb);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .staff-card {
+            background: white;
+            width: 450px;
+            max-width: 100%;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 35px rgba(20, 59, 85, 0.10);
+        }
+        .admin-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            border-radius: 16px;
+            background: #e7f6f5;
+            color: #159f9b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+        h2 {
+            text-align: center;
+            color: #153b55;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #758695;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+        .alert-error {
+            background: #ffebeb;
+            color: #c92a2a;
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        .alert-success {
+            background: #e7f7ed;
+            color: #16834f;
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            color: #174b72;
+            font-weight: bold;
+            font-size: 13px;
+            margin: 15px 0 6px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dce5eb;
+            border-radius: 7px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: #159f9b;
+            box-shadow: 0 0 0 3px rgba(21,159,155,0.10);
+        }
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 24px;
+            border: none;
+            border-radius: 7px;
+            background: #159f9b;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        button:hover { background: #117c79; }
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        .back-link a {
+            color: #159f9b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .security-badge {
+            margin-top: 18px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #64748b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="staff-card">
+    <div class="admin-icon">🛡️</div>
+    <h2>Staff Account Setup</h2>
+    <p class="subtitle">
+        {% if staff_count == 0 %}
+            Create the initial Hospital Administrator account
+        {% else %}
+            Authorized Hospital Staff Account Management
+        {% endif %}
+    </p>
+
+    {% if error %}
+    <div class="alert-error">{{ error }}</div>
+    {% endif %}
+
+    {% if success %}
+    <div class="alert-success">{{ success }}</div>
+    {% endif %}
+
+    {% if not setup_locked %}
+    <form method="POST" action="/setup-staff">
+        <label>Staff Full Name</label>
+        <input type="text" name="staff_name" placeholder="e.g. Dr. Rajesh Kumar / Admin Officer" required>
+
+        <label>Official Email</label>
+        <input type="email" name="email" placeholder="staff@hospital.org" required>
+
+        <label>Role</label>
+        <select name="role" required>
+            <option value="Admin">Administrator</option>
+            {% if staff_count > 0 %}
+            <option value="Staff">Hospital Staff</option>
+            <option value="Desk Coordinator">Desk Coordinator</option>
+            {% endif %}
+        </select>
+
+        <label>Password (min. 8 characters)</label>
+        <input type="password" name="password" placeholder="Create strong password" required minlength="8">
+
+        {% if requires_passcode %}
+        <label>Setup Authorization Passcode</label>
+        <input type="password" name="setup_passcode" placeholder="Enter STAFF_SETUP_PASSCODE" required>
+        {% endif %}
+
+        <button type="submit">Create Staff Account →</button>
+    </form>
+    {% else %}
+    <div style="text-align:center; padding:10px 0;">
+        <a href="/admin-login" style="display:inline-block; padding:12px 24px; background:#159f9b; color:white; border-radius:7px; text-decoration:none; font-weight:bold;">Go to Staff Login →</a>
+    </div>
+    {% endif %}
+
+    <div class="back-link">
+        {% if is_admin_session %}
+        <a href="/admin-dashboard">← Back to Admin Dashboard</a>
+        {% else %}
+        <a href="/admin-login">← Back to Staff Login</a>
+        {% endif %}
+    </div>
+
+    <div class="security-badge">
+        🔒 Protected administrative onboarding. After initial creation, setup is restricted to authenticated Administrators.
+    </div>
+</div>
+
+</body>
+</html>

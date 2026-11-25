@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Staff Login | Smart OPD</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #eaf5f7, #f4f7fb);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .admin-login-card {
+            background: white;
+            width: 420px;
+            max-width: 100%;
+            padding: 38px;
+            border-radius: 16px;
+            box-shadow: 0 10px 35px rgba(20, 59, 85, 0.10);
+        }
+
+        .admin-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            border-radius: 16px;
+            background: #e7f6f5;
+            color: #159f9b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #153b55;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #758695;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            color: #174b72;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 17px 0 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #dce5eb;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #159f9b;
+            box-shadow: 0 0 0 3px rgba(21,159,155,0.10);
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 7px;
+            background: #159f9b;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #117c79;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 13px;
+        }
+
+        .back-link a {
+            color: #159f9b;
+            text-decoration: none;
+        }
+
+        .security-note {
+            text-align: center;
+            color: #8a9aa5;
+            font-size: 11px;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-login-card">
+
+    <div class="admin-icon">🏥</div>
+
+    <h2>Hospital Staff Login</h2>
+
+    <p class="subtitle">
+        Access the Smart OPD administration portal
+    </p>
+
+    {% if error %}
+    <div style="background:#ffebeb; color:#c92a2a; padding:10px 14px; border-radius:7px; font-size:13px; margin-bottom:16px;">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="background:#fff4e5; color:#9a5b13; padding:10px 14px; border-radius:7px; font-size:13px; margin-bottom:16px;">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/admin-login">
+
+        <label>Email Address</label>
+
+        <input
+            type="email"
+            name="email"
+            placeholder="Enter your staff email"
+            required
+        >
+
+        <label>Password</label>
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+        >
+
+        <button type="submit">
+            Login to Admin Portal →
+        </button>
+
+    </form>
+
+    <div class="back-link">
+        {% if staff_count == 0 %}
+        <a href="/setup-staff" style="display:block; margin-bottom:10px; font-weight:bold;">Initial Setup: Create First Admin Account →</a>
+        {% endif %}
+        <a href="/">← Back to Home</a> &bull; <a href="/login">Patient Login</a>
+    </div>
+
+    <p class="security-note">
+        Authorized hospital staff only
+    </p>
+
+</div>
+
+</body>
+</html>

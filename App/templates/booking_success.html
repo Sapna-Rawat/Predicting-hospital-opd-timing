@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed | Smart OPD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            background: #f3f7fa;
+            margin: 0;
+        }
+        .success-wrapper {
+            max-width: 650px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+        .success-card {
+            background: white;
+            border-radius: 16px;
+            padding: 36px;
+            box-shadow: 0 8px 30px rgba(20, 59, 85, 0.08);
+            text-align: center;
+        }
+        .check-badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #e3f7ed;
+            color: #16834d;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .success-card h1 {
+            color: #153b55;
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+        .success-card .sub {
+            color: #758695;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .token-box {
+            background: #eaf7f7;
+            border: 2px dashed #159f9b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .token-box span {
+            display: block;
+            font-size: 13px;
+            color: #174b72;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .token-box .token-num {
+            font-size: 52px;
+            font-weight: bold;
+            color: #159f9b;
+            margin-top: 4px;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            text-align: left;
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+        .detail-item small {
+            display: block;
+            color: #788b99;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .detail-item strong {
+            color: #153b55;
+            font-size: 14px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            padding: 11px 20px;
+            background: #159f9b;
+            color: white;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .btn-primary:hover { background: #117c79; }
+        .btn-secondary {
+            padding: 11px 20px;
+            background: #eaf5f7;
+            color: #174b72;
+            border: 1px solid #c9e3e7;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        @media (max-width: 550px) {
+            .details-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <div class="logo">
+        <span class="logo-icon">✚</span>
+        Smart<span>OPD</span>
+    </div>
+    <div class="nav-buttons">
+        <a href="/dashboard" class="login-btn">Dashboard</a>
+        <a href="/logout" class="register-btn">Logout</a>
+    </div>
+</header>
+
+<div class="success-wrapper">
+    <div class="success-card">
+        <div class="check-badge">✓</div>
+        <h1>Appointment Booked Successfully!</h1>
+        <p class="sub">Your OPD queue token has been generated for {{ department.department_name }}.</p>
+
+        <div class="token-box">
+            <span>Your Department Token Number</span>
+            <div class="token-num">#{{ token_number }}</div>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-item">
+                <small>Department</small>
+                <strong>{{ department.department_name }}</strong>
+            </div>
+            <div class="detail-item">
+                <small>Assigned Doctor</small>
+                <strong>{{ doctor.doctor_name }}</strong>
+            </div>
+            <div class="detail-item">
+                <small>Appointment Date</small>
+                <strong>{{ appointment.appointment_date }}</strong>
+            </div>
+            <div class="detail-item">
+                <small>Scheduled Time</small>
+                <strong>{{ appointment.appointment_time }}</strong>
+            </div>
+            {% if wait_minutes is defined and wait_minutes is not none %}
+            <div class="detail-item">
+                <small>Initial Estimated Wait</small>
+                <strong>{{ wait_minutes | round(1) }} min</strong>
+            </div>
+            {% endif %}
+            {% if service_minutes is defined and service_minutes is not none %}
+            <div class="detail-item">
+                <small>Initial Est. Consultation</small>
+                <strong>{{ service_minutes | round(1) }} min</strong>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="actions">
+            <a href="/queue?appointment_id={{ appointment.appointment_id }}" class="btn-primary">Track Live Queue →</a>
+            <a href="/prediction?appointment_id={{ appointment.appointment_id }}" class="btn-secondary">View AI Predictions</a>
+            <a href="/dashboard" class="btn-secondary">Go to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

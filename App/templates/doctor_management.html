@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Management | Smart OPD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f3f7fa;
+            color: #243b50;
+            font-family: Arial, sans-serif;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #153b55;
+            color: white;
+            padding: 28px 18px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            font-size: 21px;
+            margin: 0 0 35px;
+            color: white;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #dce9f0;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 7px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #159f9b;
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            min-width: 0;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .topbar h1 {
+            font-size: 26px;
+            color: #153b55;
+            margin: 0 0 7px;
+        }
+
+        .topbar p {
+            color: #788b99;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .alert-error {
+            background: #ffebeb;
+            color: #c92a2a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #e7f7ed;
+            color: #16834d;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(20, 59, 85, 0.05);
+            border-top: 3px solid #159f9b;
+        }
+
+        .summary-card p {
+            color: #7b8d9a;
+            font-size: 12px;
+            margin: 0 0 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .summary-card h2 {
+            font-size: 28px;
+            color: #153b55;
+            margin: 0;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 3px 15px rgba(20, 59, 85, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .panel h3 {
+            color: #153b55;
+            margin: 0 0 20px;
+            font-size: 18px;
+            border-bottom: 1px solid #edf1f4;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 17px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: #34556c;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #dce5eb;
+            border-radius: 7px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background: white;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #159f9b;
+        }
+
+        .add-btn {
+            padding: 12px 24px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 7px;
+            background: #159f9b;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background: #117c79;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 14px 10px;
+            text-align: left;
+            border-bottom: 1px solid #edf1f4;
+        }
+
+        th {
+            color: #82919c;
+            font-weight: 600;
+            background: #fafcfd;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .available {
+            background: #e3f7ed;
+            color: #16834d;
+        }
+
+        .unavailable {
+            background: #fff0dc;
+            color: #bd7517;
+        }
+
+        .update-form {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .update-form select {
+            padding: 6px 10px;
+            border: 1px solid #dce5eb;
+            border-radius: 6px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .update-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #159f9b;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .update-btn:hover {
+            background: #117c79;
+        }
+
+        .notice {
+            padding: 16px;
+            background: #eaf5f7;
+            color: #315c70;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 800px) {
+            .summary-grid, .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <aside class="sidebar">
+        <div>
+            <h2>🏥 Smart OPD</h2>
+            <a href="/admin-dashboard">📊 Dashboard</a>
+            <a href="/admin-queue">👥 Manage Queue</a>
+            <a href="/admin-doctors" class="active">👨‍⚕️ Doctor Management</a>
+            <a href="/setup-staff">🛡️ Staff Accounts</a>
+            <a href="/">🌐 Public Home</a>
+        </div>
+        <div>
+            <a href="/admin-logout" style="color:#fca5a5;">🚪 Logout ({{ session.get('staff_name', 'Staff') }})</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <div class="topbar">
+            <div>
+                <h1>Hospital Doctor Directory &amp; Staffing</h1>
+                <p>Register Doctors, Assign Department Specializations &amp; Toggle Live OPD Availability</p>
+            </div>
+        </div>
+
+        {% if request.args.get('error') %}
+        <div class="alert-error">{{ request.args.get('error') }}</div>
+        {% endif %}
+
+        {% if request.args.get('success') %}
+        <div class="alert-success">{{ request.args.get('success') }}</div>
+        {% endif %}
+
+        <!-- Doctor Statistics -->
+        <section class="summary-grid">
+            <div class="summary-card">
+                <p>Total Registered Doctors</p>
+                <h2>{{ total_doctors|default(0) }}</h2>
+            </div>
+            <div class="summary-card">
+                <p>Available on Duty</p>
+                <h2>{{ available_doctors|default(0) }}</h2>
+            </div>
+            <div class="summary-card">
+                <p>Currently Unavailable</p>
+                <h2>{{ unavailable_doctors|default(0) }}</h2>
+            </div>
+        </section>
+
+        <!-- Add Doctor Form -->
+        <section class="panel">
+            <h3>➕ Register New Hospital Doctor</h3>
+
+            <form method="POST" action="/admin-add-doctor">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Doctor Full Name</label>
+                        <input type="text" name="doctor_name" placeholder="e.g. Dr. Ramesh Patel" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Assigned Department</label>
+                        <select name="department_id" required>
+                            <option value="">Choose Department</option>
+                            {% for department in departments %}
+                            <option value="{{ department.department_id }}">
+                                {{ department.department_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Clinical Specialization</label>
+                        <input type="text" name="specialization" placeholder="e.g. Interventional Cardiology, Pediatrician" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Initial Availability Status</label>
+                        <select name="availability_status" required>
+                            <option value="Available">Available (Accepting OPD Appointments)</option>
+                            <option value="Unavailable">Unavailable (Off Duty / Leave)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="add-btn">+ Register Doctor</button>
+            </form>
+        </section>
+
+        <!-- Doctor Roster -->
+        <section class="panel">
+            <h3>Hospital Doctor Roster</h3>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Doctor ID</th>
+                            <th>Doctor Name</th>
+                            <th>Department</th>
+                            <th>Specialization</th>
+                            <th>Current Availability</th>
+                            <th>Change Availability</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for doc in doctors %}
+                        <tr>
+                            <td>#{{ doc.doctor_id }}</td>
+                            <td><strong>{{ doc.doctor_name }}</strong></td>
+                            <td>{{ doc.department_name }}</td>
+                            <td>{{ doc.specialization or "General" }}</td>
+                            <td>
+                                {% if doc.availability_status == 'Available' %}
+                                    <span class="status available">✓ Available</span>
+                                {% else %}
+                                    <span class="status unavailable">✕ Unavailable</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="POST" action="/admin-update-doctor" class="update-form">
+                                    <input type="hidden" name="doctor_id" value="{{ doc.doctor_id }}">
+                                    <select name="availability_status" required>
+                                        <option value="Available" {% if doc.availability_status == 'Available' %}selected{% endif %}>Available</option>
+                                        <option value="Unavailable" {% if doc.availability_status == 'Unavailable' %}selected{% endif %}>Unavailable</option>
+                                    </select>
+                                    <button type="submit" class="update-btn">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:30px; color:#64748b;">No doctors registered in the database yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="notice">
+            <strong>Patient Booking Integration:</strong>
+            When a doctor is set to <em>Unavailable</em>, they are automatically hidden from the patient appointment booking dropdown, preventing patients from booking unavailable doctors.
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

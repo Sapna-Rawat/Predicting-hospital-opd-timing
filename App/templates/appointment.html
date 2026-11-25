@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Book OPD Appointment</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            width: 420px;
+            max-width: 92%;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #174b72;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 7px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: #176b87;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 25px;
+            background: #176b87;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #104d64;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #176b87;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            color: #666;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Book OPD Appointment</h2>
+
+    {% if error %}
+    <div style="background:#ffebeb; color:#c92a2a; padding:10px 14px; border-radius:6px; font-size:13px; margin-bottom:15px;">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('book_appointment') }}">
+
+        <!-- Department Selection -->
+
+        <label for="department_id">
+            Select Department
+        </label>
+
+        <select
+            name="department_id"
+            id="department_id"
+            required
+        >
+
+            <option value="">Choose Department</option>
+
+            {% for department in departments %}
+
+            <option value="{{ department.department_id }}">
+
+                {{ department.department_name }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <!-- Doctor Selection -->
+
+        <label for="doctor_id">
+            Select Doctor
+        </label>
+
+        <select
+            name="doctor_id"
+            id="doctor_id"
+            required
+            disabled
+        >
+
+            <option value="">Choose Department First</option>
+
+            {% for doctor in doctors %}
+
+            <option
+                value="{{ doctor.doctor_id }}"
+                data-department="{{ doctor.department_id }}"
+            >
+
+                {{ doctor.doctor_name }} -
+                {{ doctor.specialization or "General" }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+        <p class="message" id="doctor_message">
+            Please select a department to view available doctors.
+        </p>
+
+
+        <!-- Appointment Date -->
+
+        <label for="appointment_date">
+            Appointment Date
+        </label>
+
+        <input
+            type="date"
+            name="appointment_date"
+            id="appointment_date"
+            min="{{ today }}"
+            required
+        >
+
+
+        <!-- Appointment Time -->
+
+        <label for="appointment_time">
+            Appointment Time
+        </label>
+
+        <input
+            type="time"
+            name="appointment_time"
+            id="appointment_time"
+            required
+        >
+
+
+        <!-- Submit Button -->
+
+        <button type="submit" id="submit_button" disabled>
+            Book Appointment
+        </button>
+
+    </form>
+
+    <a href="{{ url_for('dashboard') }}" class="back-link">
+        Back to Dashboard
+    </a>
+
+</div>
+
+
+<!-- JavaScript for Department-Based Doctor Filtering -->
+
+<script>
+
+    const departmentSelect =
+        document.getElementById("department_id");
+
+    const doctorSelect =
+        document.getElementById("doctor_id");
+
+    const doctorMessage =
+        document.getElementById("doctor_message");
+
+    const submitButton =
+        document.getElementById("submit_button");
+
+
+    // Store all doctors received from Flask
+
+    const allDoctors = Array.from(
+        doctorSelect.querySelectorAll("option[data-department]")
+    );
+
+
+    // Filter doctors when department changes
+
+    departmentSelect.addEventListener("change", function () {
+
+        const selectedDepartment = this.value;
+
+        // Reset doctor dropdown
+
+        doctorSelect.innerHTML = "";
+
+        const defaultOption = document.createElement("option");
+
+        defaultOption.value = "";
+        defaultOption.textContent = "Choose Doctor";
+
+        doctorSelect.appendChild(defaultOption);
+
+        // Disable booking until a valid doctor is selected
+
+        doctorSelect.disabled = true;
+        submitButton.disabled = true;
+
+        if (!selectedDepartment) {
+
+            doctorSelect.options[0].textContent =
+                "Choose Department First";
+
+            doctorMessage.textContent =
+                "Please select a department to view available doctors.";
+
+            return;
+
+        }
+
+        // Find doctors belonging to selected department
+
+        const filteredDoctors = allDoctors.filter(function (doctor) {
+
+            return doctor.dataset.department === selectedDepartment;
+
+        });
+
+
+        // Display matching doctors
+
+        filteredDoctors.forEach(function (doctor) {
+
+            const option = document.createElement("option");
+
+            option.value = doctor.value;
+            option.textContent = doctor.textContent.trim();
+
+            doctorSelect.appendChild(option);
+
+        });
+
+
+        // Check whether doctors are available
+
+        if (filteredDoctors.length > 0) {
+
+            doctorSelect.disabled = false;
+
+            doctorMessage.textContent =
+                filteredDoctors.length + " doctor(s) available.";
+
+        } else {
+
+            doctorSelect.options[0].textContent =
+                "No doctors available";
+
+            doctorMessage.textContent =
+                "No available doctors in this department.";
+
+        }
+
+    });
+
+
+    // Enable submit button after doctor selection
+
+    doctorSelect.addEventListener("change", function () {
+
+        submitButton.disabled = !this.value;
+
+    });
+
+
+    // Prevent submission without a valid doctor
+
+    document.querySelector("form").addEventListener("submit", function (event) {
+
+        if (!departmentSelect.value || !doctorSelect.value) {
+
+            event.preventDefault();
+
+            alert("Please select a department and doctor.");
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
